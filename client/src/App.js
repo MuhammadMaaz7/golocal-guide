@@ -1,23 +1,25 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/common/Layout';
+import HomePage from './pages/HomePage';
 
-// Placeholder components for each panel
-const TouristPanel = () => <h2>Tourist Panel</h2>;
-const GuidePanel = () => <h2>Guide Panel</h2>;
-const BusinessPanel = () => <h2>Business Panel</h2>;
+// Placeholder components for other routes
+const TouristPage = () => <div>Tourist Page</div>;
+const GuidePage = () => <div>Guide Page</div>;
+const BusinessPage = () => <div>Business Page</div>;
+const LoginPage = () => <div>Login Page</div>;
+const SignupPage = () => <div>Sign Up Page</div>;
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/tourist" element={<TouristPanel />} />
-          <Route path="/guide" element={<GuidePanel />} />
-          <Route path="/business" element={<BusinessPanel />} />
-          <Route path="/" element={<h1>Welcome to GoLocal Guide</h1>} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/tourist" element={<TouristPage />} />
+        <Route path="/guide" element={<GuidePage />} />
+        <Route path="/business" element={<BusinessPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+      </Routes>
     </Router>
   );
 }
