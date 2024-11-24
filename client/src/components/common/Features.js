@@ -1,82 +1,68 @@
-// src/components/common/Features.js
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Shield, Map, Star, Users } from 'lucide-react';
 
 const Features = () => {
   const features = [
     {
-      icon: "⭐",
+      icon: <Shield className="w-12 h-12" />,
+      title: "Safe & Reliable Tours",
+      description: "Experience verified and secure local tours with trusted guides and guaranteed satisfaction."
+    },
+    {
+      icon: <Map className="w-12 h-12" />,
       title: "Local Expertise",
-      description: "Connect with knowledgeable local guides who share authentic experiences and hidden gems."
+      description: "Discover hidden gems and authentic experiences with knowledgeable local guides."
     },
     {
-      icon: "🤝",
-      title: "Trusted Community",
-      description: "Join a verified network of guides and travelers, ensuring safe and reliable experiences."
+      icon: <Star className="w-12 h-12" />,
+      title: "Personalized Experience",
+      description: "Get customized tours that match your interests and preferences perfectly."
     },
     {
-      icon: "🎯",
-      title: "Personalized Tours",
-      description: "Find experiences that match your interests, from adventure sports to cultural immersion."
+      icon: <Users className="w-12 h-12" />,
+      title: "Community-Driven",
+      description: "Join a thriving community of travelers, guides, and local businesses."
     }
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
-        <h2 style={{ 
-          fontSize: '2.5rem', 
-          fontWeight: 'bold', 
-          textAlign: 'center',
-          marginBottom: '3rem'
-        }}>
-          Why Choose Us?
-        </h2>
+    <div className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center text-3xl font-bold text-emerald-700 mb-16"
+        >
+          GoLocal Guide gives you the tools you need to explore and connect with local experiences.
+        </motion.h2>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '2rem',
-          padding: '1rem'
-        }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              style={{
-                padding: '2rem',
-                backgroundColor: 'white',
-                borderRadius: '0.5rem',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                gap: '1rem'
-              }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              className="text-center"
             >
-              <span style={{ fontSize: '2rem' }}>{feature.icon}</span>
-              <h3 style={{ 
-                fontSize: '1.5rem', 
-                fontWeight: 'bold',
-                color: '#1a1a1a'
-              }}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 mb-6">
+                {feature.icon}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 {feature.title}
               </h3>
-              <p style={{ 
-                fontSize: '1rem',
-                color: '#666',
-                lineHeight: '1.5'
-              }}>
+              <p className="text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
 export default Features;
+
