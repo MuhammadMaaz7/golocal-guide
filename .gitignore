@@ -43,3 +43,6 @@ Thumbs.db
 /server/logs
 /server/dist
 "@ | Out-File -FilePath ".gitignore" -Encoding utf8
+
+#secrets
+server/config/serviceAccountKey.json
