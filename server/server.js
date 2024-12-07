@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import guideRoutes from './routes/guide/guideProfileRoutes.js';  // Default import
+import packageRoutes from './routes/guide/packagesRoutes.js';  // Default import
+import jwt from 'jsonwebtoken';  // Import jwt for token generation
 
 dotenv.config();
 
@@ -21,6 +23,7 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api', guideRoutes);
+app.use('/api', packageRoutes);  // Prefix all package routes with /api
 
 // Example login route for issuing JWT tokens
 app.post('/api/login', (req, res) => {
@@ -35,7 +38,6 @@ app.post('/api/login', (req, res) => {
 
   res.status(401).json({ message: 'Invalid credentials' });
 });
-
 
 // Start server
 app.listen(port, () => {

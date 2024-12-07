@@ -1,7 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { GuideProvider } from './context/GuideContext'; // Added GuideProvider for shared data
+import { GuideProvider } from './context/GuideContext';
+import { PackageProvider } from './context/PackageContext'; // Add PackageProvider
 
 // Pages and Components
 import HomePage from './pages/HomePage';
@@ -16,6 +17,7 @@ import Discover from './pages/tourist/DiscoverPage';
 import GuideProfile from './pages/guide/GuideProfile'; // Guide Profile Page
 import MyPackagesPage from './pages/guide/MyPackagesPage'; // My Packages Page
 import AddPackageForm from './components/guide/Packages/AddPackageForm'; // Add Package Form
+import EditPackage from './components/guide/Packages/EditPackage.js'; // Add Package Form
 import PackageCard from './components/guide/Packages/PackageCard'; // Package Card
 
 import TourRequests from './pages/guide/TourRequests'; // Tour Requests Page
@@ -49,7 +51,7 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
 
       {/* Tourist Routes */}
-     <Route 
+      <Route 
         path="/tourist-dashboard"
         element={
           <ProtectedRoute allowedRoles={['Tourist']}>
@@ -91,6 +93,15 @@ function AppRoutes() {
           </ProtectedRoute>
         )} 
       />
+
+    <Route path="/edit-package/:id" 
+    element={(
+          <ProtectedRoute allowedRoles={['Guide']}>
+            <AddPackageForm />
+          </ProtectedRoute>
+        )} 
+        />
+
       <Route 
         path="/add-package" 
         element={(
@@ -165,9 +176,11 @@ function App() {
   return (
     <AuthProvider>
       <GuideProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
+        <PackageProvider> {/* Wrap with PackageProvider */}
+          <Router>
+            <AppRoutes />
+          </Router>
+        </PackageProvider>
       </GuideProvider>
     </AuthProvider>
   );

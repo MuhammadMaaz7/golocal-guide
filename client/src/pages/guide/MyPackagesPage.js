@@ -4,13 +4,16 @@ import { Package, Edit, Trash, Plus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from "../../components/guide/Sidebar"; // Sidebar import
 import { useAuth } from '../../context/AuthContext';
+import { usePackage } from '../../context/PackageContext'; // Import the context
 import { format, isBefore, startOfDay } from 'date-fns';
 
 const MyPackagesPage = () => {
   const { user } = useAuth(); // Get current user
   const navigate = useNavigate();
-  const [packages, setPackages] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Use the context hook to access packages and actions
+  const { packages, loading, error, addPackage, updatePackage, deletePackage } = usePackage(); 
+
   const [newPackage, setNewPackage] = useState({
     title: '',
     description: '',
@@ -19,6 +22,7 @@ const MyPackagesPage = () => {
     includedServices: [],
     dateField: '', // Date field for the package
   });
+
   const [showAddForm, setShowAddForm] = useState(false); // State to toggle form visibility
   const [searchTerm, setSearchTerm] = useState('');
   const [serviceOptions, setServiceOptions] = useState([
@@ -27,28 +31,16 @@ const MyPackagesPage = () => {
   const [availableServices, setAvailableServices] = useState(serviceOptions); // Filtered services based on search term
 
   useEffect(() => {
-    // Mock fetching data; replace with actual API call to fetch user's packages
-    const fetchedPackages = [
-      {
-        id: 1,
-        title: 'Mountain Adventure',
-        description: 'Explore the beautiful mountains.',
-        price: 250,
-        availableDates: ['2024-12-01', '2024-12-02'],
-        includedServices: ['Meals', 'Transport'],
-      },
-      {
-        id: 2,
-        title: 'City Tour',
-        description: 'A guided tour through the city.',
-        price: 120,
-        availableDates: ['2024-12-10', '2024-12-12'],
-        includedServices: ['Transport', 'Guide'],
-      },
-    ];
-    setPackages(fetchedPackages);
-    setIsLoading(false);
-  }, []);
+    console.log("Useffect packages: ",packages);
+ 
+    if (!loading ) {
+      console.log("Packages loaded:", packages);
+    }
+    else
+    {
+      console.log("LoADINGGGGGGGGGGGGGGGGG");
+    }
+  }, [loading, error, packages]);
 
   // Handle input change for adding new package
   const handleInputChange = (e) => {
@@ -62,26 +54,31 @@ const MyPackagesPage = () => {
   // Handle adding a new package
   const handleAddPackage = (e) => {
     e.preventDefault();
+    console.log("Adding package");
     const newPkg = {
       ...newPackage,
-      id: packages.length + 1, // Assuming package ids are incremental
+      id: user._id, // Assuming package ids are incremental
       availableDates: newPackage.availableDates.split(','),
     };
-    setPackages((prevPackages) => [...prevPackages, newPkg]);
-    setNewPackage({
-      title: '',
-      description: '',
-      price: '',
-      availableDates: '',
-      includedServices: [],
-      dateField: '',
-    });
+
+    console.log("New pacakge: ",newPkg);
+    addPackage(newPkg); // Call addPackage function from context
+    // setNewPackage({
+    //   title: '',
+    //   description: '',
+    //   price: '',
+    //   availableDates: '',
+    //   includedServices: [],
+    //   dateField: '',
+    // });
     setShowAddForm(false); // Hide form after adding package
+    
   };
 
   // Handle editing a package
   const handleEditPackage = (id) => {
-    const pkg = packages.find((pkg) => pkg.id === id);
+    console.log("Editing package with id: ",id);
+    const pkg = packages.find((pkg) => pkg._id === id);
     setNewPackage({
       ...pkg,
       availableDates: pkg.availableDates.join(','),
@@ -92,7 +89,9 @@ const MyPackagesPage = () => {
 
   // Handle deleting a package
   const handleDeletePackage = (id) => {
-    setPackages(packages.filter((pkg) => pkg.id !== id));
+    console.log("delete found: ",id);
+
+    deletePackage(id); // Call deletePackage function from context
   };
 
   // Handle adding/removing services
@@ -107,6 +106,7 @@ const MyPackagesPage = () => {
   };
 
   const handleRemoveService = (service) => {
+    console.log("sersvive found: ",service)
     setNewPackage((prev) => ({
       ...prev,
       includedServices: prev.includedServices.filter((s) => s !== service),
@@ -235,17 +235,16 @@ const MyPackagesPage = () => {
                     </button>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-2">
+
+                {/* Display selected services */}
+                <div className="mt-4">
                   {newPackage.includedServices.map((service) => (
-                    <div
-                      key={service}
-                      className="flex items-center gap-1 bg-emerald-100 text-emerald-600 px-2 py-1 rounded-md"
-                    >
-                      {service}
+                    <div key={service} className="inline-flex items-center gap-2 mb-2">
+                      <span className="text-sm">{service}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveService(service)}
-                        className="text-red-600"
+                        className="text-red-500"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -254,6 +253,7 @@ const MyPackagesPage = () => {
                 </div>
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 transition duration-300"
@@ -262,60 +262,49 @@ const MyPackagesPage = () => {
               </button>
             </form>
           </motion.div>
-        ) : (
-          // Display List of Packages
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {isLoading ? (
-              <div>Loading...</div>
+        ) : null}
+
+        {/* Package List */}
+        {loading ? (
+          <div className="text-center text-lg text-gray-600">Loading packages...</div>
+        ) //: error ? (
+         // <div className="text-center text-lg text-red-600">Error loading packages.</div>
+       // ) 
+        : (
+          <div>
+            {packages.length === 0 ? (
+              <div>No packages available.</div>
             ) : (
-              packages.map((pkg) => (
-                <motion.div
-                  key={pkg.id}
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-white shadow-lg rounded-lg p-6 space-y-4"
-                >
-                  <h3 className="text-xl font-semibold text-blue-800">{pkg.title}</h3>
-                  <p className="text-gray-700">{pkg.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Price: ${pkg.price}</span>
-                    <div className="flex gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {packages.map((pkg) => (
+                  <div key={pkg._id} className="bg-white p-4 rounded-lg shadow-lg">
+                    <h4 className="text-lg font-semibold text-blue-800">{pkg.title}</h4>
+                    <p className="text-sm text-gray-700">{pkg.description}</p>
+                    <div className="mt-2">
+                      <strong>Price:</strong> ${pkg.price}
+                    </div>
+                    <div className="mt-2">
+                      <strong>Available Dates:</strong> {pkg.availableDates.join(', ')}
+                    </div>
+                    <div className="flex gap-4 mt-4">
                       <button
-                        onClick={() => handleEditPackage(pkg.id)}
-                        className="text-emerald-600 hover:text-emerald-800 transition"
+                        onClick={() => handleEditPackage(pkg._id)}
+                        className="text-blue-600 hover:text-blue-800"
                       >
                         <Edit className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => handleDeletePackage(pkg.id)}
-                        className="text-red-600 hover:text-red-800 transition"
+                        onClick={() => handleDeletePackage(pkg._id)}
+                        className="text-red-600 hover:text-red-800"
                       >
                         <Trash className="w-5 h-5" />
                       </button>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-600">
-                    <strong>Available Dates:</strong>
-                    {pkg.availableDates.map((date, index) => (
-                      <span key={index} className="block">{new Date(date).toLocaleDateString()}</span>
-                    ))}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <strong>Included Services:</strong>
-                    <ul className="list-disc pl-5">
-                      {pkg.includedServices.map((service, index) => (
-                        <li key={index} className="text-gray-600">{service}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              ))
+                ))}
+              </div>
             )}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

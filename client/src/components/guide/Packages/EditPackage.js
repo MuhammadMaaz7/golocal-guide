@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { usePackage } from './PackageContext'; // Import the context hook
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AddPackageForm = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const { packages, fetchPackages, addPackage, updatePackage } = usePackage(); // Use context functions
 
   const [formData, setFormData] = useState({
     title: '',
@@ -14,27 +11,7 @@ const AddPackageForm = () => {
     availableDates: [],
     includedServices: [],
   });
-
   const [errors, setErrors] = useState({});
-
-  // Fetch existing package details for editing
-  useEffect(() => {
-    if (id) {
-      const existingPackage = packages.find((pkg) => pkg._id === id); // Find the package by ID
-      if (existingPackage) {
-        setFormData({
-          title: existingPackage.title || '',
-          description: existingPackage.description || '',
-          price: existingPackage.price || '',
-          availableDates: existingPackage.availableDates || [],
-          includedServices: existingPackage.includedServices || [],
-        });
-      } else {
-        // Fetch packages if they are not already loaded
-        fetchPackages();
-      }
-    }
-  }, [id, packages, fetchPackages]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,17 +45,12 @@ const AddPackageForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      if (id) {
-        // Update existing package
-        await updatePackage(id, formData);
-      } else {
-        // Add a new package
-        await addPackage(formData);
-      }
+      // Submit form (call an API or similar)
+      console.log('Form submitted', formData);
       navigate('/my-packages');
     } else {
       setErrors(validationErrors);
@@ -87,9 +59,7 @@ const AddPackageForm = () => {
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">
-        {id ? 'Edit Package' : 'Add New Package'}
-      </h2>
+      <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">Add New Package</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm text-gray-700" htmlFor="title">Package Title</label>
@@ -137,7 +107,7 @@ const AddPackageForm = () => {
             type="text"
             id="availableDates"
             name="availableDates"
-            value={formData.availableDates.join(',')}
+            value={formData.availableDates}
             onChange={handleDateChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
             placeholder="e.g., 2024-12-01, 2024-12-02"
@@ -151,7 +121,7 @@ const AddPackageForm = () => {
             type="text"
             id="includedServices"
             name="includedServices"
-            value={formData.includedServices.join(',')}
+            value={formData.includedServices}
             onChange={handleServiceChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
             placeholder="e.g., meals, transport"
@@ -159,7 +129,7 @@ const AddPackageForm = () => {
         </div>
 
         <button type="submit" className="w-full bg-blue-800 text-white p-3 rounded-md hover:bg-blue-700 transition duration-300">
-          {id ? 'Update Package' : 'Add Package'}
+          Add Package
         </button>
       </form>
     </div>
