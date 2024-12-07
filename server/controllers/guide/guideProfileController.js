@@ -26,8 +26,8 @@ const uploadImage = async (req, res) => {
 const getGuideProfile = async (req, res) => {
   try {
     const userId = req.user.id; // Retrieved from auth middleware
-    const guide = await Guide.findOne({ userID: userId })
-      .populate('userID', 'name email profilePictureURL rating totalReviews');
+    const guide = await Guide.findOne({ userID: req.user.id }).populate('userID', 'name email profilePictureURL');
+
       
     if (!guide) return res.status(404).json({ message: 'Guide not found' });
 

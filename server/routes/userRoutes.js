@@ -80,25 +80,27 @@ router.post('/signup', async (req, res) => {
 
     await user.save();
    // Check if the role is 'Guide' and create a Guide document
-   if (role === 'Guide') {
-    const { experience, languages, specialization } = additionalInfo; // Extract these from additionalInfo
-
+   if (role == 'Guide') {
+    const { experience, languages, specialization } = additionalInfo;
+  
     if (!experience || !languages || !specialization) {
-      // Ensure all necessary fields for Guide are present
       return res.status(400).json({
         message: 'Please provide all required fields for Guide: experience, languages, and specialization',
       });
     }
-
-    // Create the Guide document without the fee field
+  
+    console.log('Creating guide for user:', user._id);
+  
     const guide = new Guide({
-      userID: user._id,  // Link to the User model
-      guideType: specialization,  // Specialization as guide type
-      yearsOfExperience: experience,  // Experience as years of experience
-      languages,  // List of languages spoken
-      expertiseAreas: [specialization],  // Expertise area based on specialization
+      userID: user._id,
+      guideType: specialization,
+      yearsOfExperience: experience,
+      languages,
+      expertiseAreas: [specialization],
     });
+  
     await guide.save();
+    console.log('Guide saved:', guide);
   }
 
     const token = generateToken(user);
@@ -112,6 +114,7 @@ router.post('/signup', async (req, res) => {
 // Login
 router.post('/login', async (req, res) => {
   try {
+    
     const { email, password } = req.body;
     const user = await User.findOne({ email });
 

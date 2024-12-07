@@ -22,6 +22,21 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api', guideRoutes);
 
+// Example login route for issuing JWT tokens
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Simulate user authentication (replace this with real database check)
+  if (username === 'admin' && password === 'password') {
+    const user = { username }; // This can be expanded to include more user details
+    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return res.json({ token });
+  }
+
+  res.status(401).json({ message: 'Invalid credentials' });
+});
+
+
 // Start server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

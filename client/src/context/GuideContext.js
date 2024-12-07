@@ -11,17 +11,33 @@ export const GuideProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Assuming you have an endpoint like '/api/guide/profile'
     const fetchGuideData = async () => {
       try {
-        console.log('Fetching guide data...');
+        console.log('Fetching guide data');
         
-        const response = await axios.get('http://localhost:5000/api/guide/profile');
-        console.log('Fetched guide data:', response.data); // Log the data here
-        
-        // Check if the response data is valid and not empty
+        // Get the token from localStorage (or wherever it is stored)
+        const token = localStorage.getItem('token'); // Adjust key name as needed
+        console.log(token);
+
+        // If the token is not available, handle the case (e.g., redirect or set an error)
+        if (!token) {
+          console.error('No token found');
+          setGuideData(null); // Or handle the error appropriately
+          setLoading(false);
+          return;
+        }
+
+        // Use axios to send the GET request with the Authorization header
+        const response = await axios.get('http://localhost:5000/api/guide/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`, // Ensure this is the correct token format
+          },
+        });
+
+        console.log('Fetched guide data:', response.data);
         if (response.data && response.data.name) {
-          setGuideData(response.data); // Assuming response.data is an object
+          setGuideData(response.data); // Store the guide data
         } else {
           setGuideData(null); // Or some default empty state
         }
@@ -34,7 +50,7 @@ export const GuideProvider = ({ children }) => {
     };
 
     fetchGuideData();
-  }, []); // Empty dependency array to fetch data only on mount
+  }, []); // Empty dependency array ensures it only runs once on mount
 
   return (
     <GuideContext.Provider value={{ guideData, loading }}>

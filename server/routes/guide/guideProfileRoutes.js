@@ -1,9 +1,9 @@
 import express from 'express';
 import authMiddleware from '../../middleware/auth.js'; // Ensure this middleware checks authentication
+
 import Guide from '../../models/guide/guideModel.js';
 
 const router = express.Router();
-// Backend - /api/guide/profile route
 router.get('/guide/profile', authMiddleware, async (req, res) => {
   try {
     console.log('User ID from middleware:', req.user.id); // Log the user ID
