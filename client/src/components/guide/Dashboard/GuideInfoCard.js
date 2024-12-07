@@ -1,12 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import ProfileCard from './ProfileCard';
+import GuideInfoCard from './GuideInfoCard';
 
-const GuideInfoCard = ({ title, value }) => {
+const Dashboard = ({ userId }) => {
+  const [guideData, setGuideData] = useState(null);
+
+  useEffect(() => {
+    const fetchGuideData = async () => {
+      try {
+        const response = await fetch(`/api/guide/profile`);
+        const data = await response.json();
+        if (response.ok) {
+          setGuideData(data);  // Set the guide data
+        } else {
+          console.error('Error fetching guide data:', data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching guide data:', error);
+      }
+    };
+
+    if (userId) {
+      fetchGuideData();
+    }
+  }, [userId]);
+
+  if (!guideData) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition duration-300 ease-in-out transform hover:scale-105">
-      <h3 className="text-xl font-semibold text-blue-800">{title}</h3>
-      <p className="text-lg text-blue-600">{value}</p>
+    <div>
+      <ProfileCard profileData={guideData} />
+      <div className="grid grid-cols-2 gap-6 mt-6">
+        <GuideInfoCard title="Experience" value={`${guideData.yearsOfExperience} years`} />
+        <GuideInfoCard title="Languages" value={guideData.languages.join(', ')} />
+        <GuideInfoCard title="Specialization" value={guideData.expertiseAreas.join(', ')} />
+      </div>
     </div>
   );
 };
 
-export default GuideInfoCard;
+export default Dashboard;

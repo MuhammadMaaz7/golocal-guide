@@ -1,7 +1,9 @@
-const express = require('express');
+import express from 'express';
+import User from '../models/User.js';
+import Guide from '../models/guide/guideModel.js';
+import jwt from 'jsonwebtoken';
+
 const router = express.Router();
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
 
 const generateToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -11,18 +13,18 @@ const generateToken = (user) => {
 router.post('/google-auth', async (req, res) => {
   try {
     const { email, name, googleId, photoURL } = req.body;
-    
+
     let user = await User.findOne({ $or: [{ email }, { googleId }] });
-    
+
     if (user) {
       // User exists, log them in
       const token = generateToken(user);
       res.status(200).json({ user, token, message: 'Successfully logged in with Google' });
     } else {
       // New user, send back info for frontend to complete registration
-      res.status(202).json({ 
+      res.status(202).json({
         message: 'Please complete your profile',
-        partialUser: { email, name, googleId, photoURL }
+        partialUser: { email, name, googleId, photoURL },
       });
     }
   } catch (error) {
@@ -31,12 +33,11 @@ router.post('/google-auth', async (req, res) => {
   }
 });
 
-
 // Complete Google Sign Up
 router.post('/complete-google-signup', async (req, res) => {
   try {
     const { email, name, googleId, photoURL, role, ...additionalInfo } = req.body;
-    
+
     const user = new User({
       email,
       name,
@@ -44,11 +45,12 @@ router.post('/complete-google-signup', async (req, res) => {
       photoURL,
       role,
       ...additionalInfo,
-      isProfileComplete: true
+      isProfileComplete: true,
     });
-    
+
     await user.save();
-    
+
+
     const token = generateToken(user);
     res.status(201).json({ user, token, message: 'User created successfully' });
   } catch (error) {
@@ -61,23 +63,44 @@ router.post('/complete-google-signup', async (req, res) => {
 router.post('/signup', async (req, res) => {
   try {
     const { email, password, name, role, ...additionalInfo } = req.body;
-    
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'User already exists with this email' });
     }
-    
+
     const user = new User({
       email,
       password,
       name,
       role,
       ...additionalInfo,
-      isProfileComplete: Object.keys(additionalInfo).length > 0
+      isProfileComplete: Object.keys(additionalInfo).length > 0,
     });
-    
+
     await user.save();
-    
+   // Check if the role is 'Guide' and create a Guide document
+   if (role === 'Guide') {
+    const { experience, languages, specialization } = additionalInfo; // Extract these from additionalInfo
+
+    if (!experience || !languages || !specialization) {
+      // Ensure all necessary fields for Guide are present
+      return res.status(400).json({
+        message: 'Please provide all required fields for Guide: experience, languages, and specialization',
+      });
+    }
+
+    // Create the Guide document without the fee field
+    const guide = new Guide({
+      userID: user._id,  // Link to the User model
+      guideType: specialization,  // Specialization as guide type
+      yearsOfExperience: experience,  // Experience as years of experience
+      languages,  // List of languages spoken
+      expertiseAreas: [specialization],  // Expertise area based on specialization
+    });
+    await guide.save();
+  }
+
     const token = generateToken(user);
     res.status(201).json({ user, token, message: 'User created successfully' });
   } catch (error) {
@@ -86,17 +109,16 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-
 // Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    
+
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-    
+
     const token = generateToken(user);
     res.status(200).json({ user, token, message: 'Logged in successfully' });
   } catch (error) {
@@ -130,4 +152,4 @@ router.post('/check-exists', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

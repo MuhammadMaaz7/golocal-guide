@@ -1,5 +1,5 @@
 import cloudinary from '../../config/cloudinary.js';
-import Guide from '../../models/guideModel.js';
+import Guide from '../../models/guide/guideModel.js';
 import multer from 'multer';
 
 // Multer setup to handle file uploads
@@ -22,6 +22,22 @@ const uploadImage = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+const getGuideProfile = async (req, res) => {
+  try {
+    const userId = req.user.id; // Retrieved from auth middleware
+    const guide = await Guide.findOne({ userID: userId })
+      .populate('userID', 'name email profilePictureURL rating totalReviews');
+      
+    if (!guide) return res.status(404).json({ message: 'Guide not found' });
+
+    res.status(200).json(guide);
+  } catch (error) {
+    console.error('Error fetching guide profile:', error);
+    res.status(500).json({ message: 'Error fetching guide profile.' });
+  }
+};
+
 
 // Update guide profile, including the profile picture URL
 const updateGuideProfile = async (req, res) => {
