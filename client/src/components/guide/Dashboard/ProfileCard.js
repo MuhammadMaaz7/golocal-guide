@@ -1,33 +1,8 @@
-// ProfileCard.js
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-const ProfileCard = ({ userId }) => {
-  const [profileData, setProfileData] = useState(null);
-
-  useEffect(() => {
-    // Fetch the guide info based on userId
-    const fetchProfileData = async () => {
-      try {
-        const response = await fetch(`/api/guide/profile`);
-        const data = await response.json();
-        console.log(data); // Add this to inspect the data
-        if (response.ok) {
-          setProfileData(data);  // Set guide profile data
-        } else {
-          console.error('Error fetching profile data:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching profile data:', error);
-      }
-    };
-    
-
-    if (userId) {
-      fetchProfileData();
-    }
-  }, [userId]);
-
-  if (!profileData) {
+const ProfileCard = ({ profileData, user }) => {
+  // Ensure both profileData and user are available before rendering
+  if (!profileData || !user) {
     return (
       <div className="bg-white shadow-md rounded-lg p-6">
         <p className="text-gray-500">Profile data is loading...</p>
@@ -37,15 +12,22 @@ const ProfileCard = ({ userId }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
+      {/* Profile Image */}
       <img
         src={profileData.profilePictureURL || 'https://via.placeholder.com/150'}
-        alt={`${profileData.userID.name}'s Profile`}
+        alt={`${user.name || 'User'}'s Profile`}
         className="w-24 h-24 rounded-full mb-4 mx-auto"
       />
+
+      {/* User Name */}
       <h2 className="text-center text-2xl font-semibold text-blue-800">
-        {profileData.userID.name || 'No Name Available'}
+        {user.name || 'No Name Available'}
       </h2>
-      <p className="text-center text-gray-600">{profileData.userID.email || 'No Email Available'}</p>
+
+      {/* User Email */}
+      <p className="text-center text-gray-600">{user.email || 'No Email Available'}</p>
+
+      {/* Rating Info */}
       <p className="text-center text-gray-600 mt-2">
         <strong>Rating:</strong>{' '}
         {profileData.rating ? `${profileData.rating.toFixed(1)} / 5` : 'No Rating Available'}

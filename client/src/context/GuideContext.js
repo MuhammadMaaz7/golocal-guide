@@ -36,7 +36,9 @@ export const GuideProvider = ({ children }) => {
         });
 
         console.log('Fetched guide data:', response.data);
-        if (response.data && response.data.name) {
+        if (response.data) {
+          console.log('setting guide.data:');
+
           setGuideData(response.data); // Store the guide data
         } else {
           setGuideData(null); // Or some default empty state

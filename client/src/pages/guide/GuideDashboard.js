@@ -5,8 +5,9 @@ import ProfileCard from '../../components/guide/Dashboard/ProfileCard';
 import GuideInfoCard from '../../components/guide/Dashboard/GuideInfoCard';
 import RatingsGraph from '../../components/guide/Dashboard/RatingsGraph';
 import { useGuide } from '../../context/GuideContext';
-
+import { useAuth } from '../../context/AuthContext';
 const GuideDashboard = () => {
+  const { user } = useAuth();
   const { guideData } = useGuide();
 
   if (!guideData) {
@@ -30,7 +31,7 @@ const GuideDashboard = () => {
         {/* Cards Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Profile Card */}
-          <ProfileCard profileData={guideData} />
+          <ProfileCard profileData={guideData} user={user} />
 
           {/* Guide Info Card */}
           <GuideInfoCard guideInfo={guideData} />
