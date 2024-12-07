@@ -1,12 +1,14 @@
 import mongoose from 'mongoose';
 
 const guideSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, trim: true },
-    passwordHash: { type: String, required: true },
+    userID: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', // Reference the User model
+        required: true 
+    },
     guideType: { type: String, required: true },
     yearsOfExperience: { type: Number, required: true },
-    fee: { type: Number, required: true },
+    fee: { type: Number},
     languages: [{ type: String }],
     expertiseAreas: [{ type: String }],
     profilePictureURL: { type: String },

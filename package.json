@@ -2,6 +2,7 @@
   "name": "golocal-guide",
   "version": "1.0.0",
   "description": "Local Tourism Management System",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node server/server.js",
