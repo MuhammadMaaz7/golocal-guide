@@ -1,10 +1,10 @@
 import React from 'react';
 
-const PackageCard = ({ title, description, price, availableDates, includedServices }) => {
+const PackageCard = ({ title, city, price, availableDates, includedServices }) => {
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 mb-6 transition-transform transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out">
       <h3 className="text-xl font-semibold mb-2 text-blue-800">{title}</h3>
-      <p className="text-gray-700 mb-4">{description}</p>
+      <p className="text-gray-700 mb-4">{city}</p>
       <div className="flex justify-between text-sm text-gray-600">
         <div>
           <strong>Price: </strong> ${price}

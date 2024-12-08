@@ -41,6 +41,7 @@ const getGuideProfile = async (req, res) => {
 
 // Update guide profile, including the profile picture URL
 const updateGuideProfile = async (req, res) => {
+  console.log("UpdateGuideProfile in controller, ",req);
   const { guideId, name, guideType, yearsOfExperience, fee, languages, expertiseAreas, profilePictureURL } = req.body;
 
   try {
@@ -56,6 +57,8 @@ const updateGuideProfile = async (req, res) => {
     guide.profilePictureURL = profilePictureURL || guide.profilePictureURL;
 
     await guide.save();
+    console.log("Updated guide in controller");
+
     res.json(guide);
   } catch (error) {
     console.error('Error updating guide profile:', error);

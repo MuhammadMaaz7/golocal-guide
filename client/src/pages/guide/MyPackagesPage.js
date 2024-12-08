@@ -13,10 +13,11 @@ const MyPackagesPage = () => {
   
   // Use the context hook to access packages and actions
   const { packages, loading, error, addPackage, updatePackage, deletePackage } = usePackage(); 
+  
 
   const [newPackage, setNewPackage] = useState({
     title: '',
-    description: '',
+    city: '',
     price: '',
     availableDates: '',
     includedServices: [],
@@ -174,10 +175,10 @@ const MyPackagesPage = () => {
 
               {/* Description */}
               <div className="mb-4">
-                <label className="block text-sm text-blue-600">Description</label>
+                <label className="block text-sm text-blue-600">City</label>
                 <textarea
-                  name="description"
-                  value={newPackage.description}
+                  name="city"
+                  value={newPackage.city}
                   onChange={handleInputChange}
                   required
                   className="w-full p-2 border rounded-md"
@@ -279,7 +280,7 @@ const MyPackagesPage = () => {
                 {packages.map((pkg) => (
                   <div key={pkg._id} className="bg-white p-4 rounded-lg shadow-lg">
                     <h4 className="text-lg font-semibold text-blue-800">{pkg.title}</h4>
-                    <p className="text-sm text-gray-700">{pkg.description}</p>
+                    <p className="text-sm text-gray-700">{pkg.city}</p>
                     <div className="mt-2">
                       <strong>Price:</strong> ${pkg.price}
                     </div>

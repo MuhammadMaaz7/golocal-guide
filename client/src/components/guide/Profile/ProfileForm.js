@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../../context/AuthContext';
 
 const ProfileForm = ({ profileData, onSave }) => {
   const [formData, setFormData] = useState(profileData);
   const [file, setFile] = useState(null);
+  const { user } = useAuth();
+
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view and edit modes
 
   useEffect(() => {
@@ -44,23 +47,30 @@ const ProfileForm = ({ profileData, onSave }) => {
     formDataForUpload.append('guideType', updatedData.guideType);
     formDataForUpload.append('yearsOfExperience', updatedData.yearsOfExperience);
     formDataForUpload.append('fee', updatedData.fee);
-    formDataForUpload.append('languages', updatedData.languages);
-    formDataForUpload.append('expertiseAreas', updatedData.expertiseAreas);
+    formDataForUpload.append('languages', updatedData.languages.join(', '));
+    formDataForUpload.append('expertiseAreas', updatedData.expertiseAreas.join(', '));
 
     if (file) {
       formDataForUpload.append('image', file);
     }
 
     try {
+      const token = localStorage.getItem('token');
       // Make the API call to save the updated guide profile
-      const response = await fetch(`/api/guides/${profileData._id}`, {
+      const response = await fetch(`http://localhost:5000/api/guide/profile`, {
         method: 'PUT',
-        body: formDataForUpload,
+        headers: {
+          'Authorization': `Bearer ${token}`, // Ensure this is the correct token format
+        },
+        body: profileData, // Send the form data
       });
 
       if (response.ok) {
         const result = await response.json();
+        console.log("Resposne ok ",result);
         onSave(result); // Call the onSave function to update the profile data
+      } else {
+        console.error('Failed to save profile');
       }
     } catch (err) {
       console.error('Error saving profile:', err);

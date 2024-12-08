@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { GuideProvider } from './context/GuideContext';
 import { PackageProvider } from './context/PackageContext'; // Add PackageProvider
+import { ExperienceProvider } from './context/ExperienceContext'; // Add ExperienceProvider
 
 // Pages and Components
 import HomePage from './pages/HomePage';
@@ -94,10 +95,10 @@ function AppRoutes() {
         )} 
       />
 
-    <Route path="/edit-package/:id" 
-    element={(
+      <Route path="/edit-package/:id" 
+        element={(
           <ProtectedRoute allowedRoles={['Guide']}>
-            <AddPackageForm />
+            <EditPackage />
           </ProtectedRoute>
         )} 
         />
@@ -177,9 +178,11 @@ function App() {
     <AuthProvider>
       <GuideProvider>
         <PackageProvider> {/* Wrap with PackageProvider */}
-          <Router>
-            <AppRoutes />
-          </Router>
+          <ExperienceProvider> {/* Wrap with ExperienceProvider */}
+            <Router>
+              <AppRoutes />
+            </Router>
+          </ExperienceProvider>
         </PackageProvider>
       </GuideProvider>
     </AuthProvider>

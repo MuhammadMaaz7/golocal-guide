@@ -5,12 +5,29 @@ import ProfileDetails from '../../components/guide/Profile/ProfileDetails';
 import { useGuide } from '../../context/GuideContext';
 
 const GuideProfile = () => {
-  const { guideData, updateGuideData } = useGuide();
+  const { guideData, updateGuideData, loading, error } = useGuide();
 
-  const handleSave = (updatedData) => {
-    updateGuideData(updatedData);
-    alert('Profile updated successfully!');
+  const handleSave = async (updatedData) => {
+    console.log("In updated func");
+    const result = await updateGuideData(updatedData);
+    if (result.success) {
+      alert('Profile updated successfully!');
+    } else {
+      alert(`Failed to update profile: ${result.message}`);
+    }
   };
+
+  if (loading) {
+    return <div>Loading profile...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error loading profile: {error}</div>;
+  }
+
+  if (!guideData) {
+    return <div className="text-gray-500">No profile data available.</div>;
+  }
 
   return (
     <div className="flex">
@@ -19,8 +36,8 @@ const GuideProfile = () => {
         <h2 className="text-3xl font-semibold text-blue-800 mb-6">Profile</h2>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <img
-            src={guideData.profilePictureURL}
-            alt={`${guideData.name}'s Profile`}
+            src={guideData.profilePictureURL || '/default-profile.png'} // Fallback to default image
+            alt={`${guideData.name || 'User'}'s Profile`}
             className="w-24 h-24 rounded-full mb-6"
           />
           <ProfileDetails profileData={guideData} />

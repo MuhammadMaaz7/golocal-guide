@@ -31,14 +31,14 @@ export const addPackage = async (req, res) => {
   console.log(req.body);
 
   // Extract the new package details from the request body
-  const { title, description, price, availableDates, includedServices, dateField, guideID } = req.body;
+  const { title, city, price, availableDates, includedServices, dateField, guideID } = req.body;
 console.log("HI");
   try {
     // Create a new package instance with the extracted fields
     const newPackage = new Package({
       guideID, // Pass the guideID from the frontend
       title,
-      description,
+      city,
       price,
       availableDates, // Ensure availableDates are stored as Date objects
       includedServices,
@@ -62,6 +62,7 @@ console.log("HI");
   
   // Update an existing package
   export const updatePackage = async (req, res) => {
+    console.log("Updating package......",req);
     try {
       const updatedPackage = await Package.findByIdAndUpdate(
         req.params.id, 
@@ -71,6 +72,8 @@ console.log("HI");
       if (!updatedPackage) {
         return res.status(404).json({ message: "Package not found" });
       }
+      console.log("Package updated");
+
       res.status(200).json(updatedPackage);  // Send the updated package in response
     } catch (error) {
       res.status(500).json({ message: "Error updating package", error });

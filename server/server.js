@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import guideRoutes from './routes/guide/guideProfileRoutes.js';  // Default import
+import experienceRoutes from './routes/guide/guideExperienceRoutes.js';  // Default import
 import packageRoutes from './routes/guide/packagesRoutes.js';  // Default import
 import jwt from 'jsonwebtoken';  // Import jwt for token generation
 
@@ -24,6 +25,8 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api', guideRoutes);
 app.use('/api', packageRoutes);  // Prefix all package routes with /api
+app.use('/api', experienceRoutes);  // Prefix all package routes with /api
+
 
 // Example login route for issuing JWT tokens
 app.post('/api/login', (req, res) => {

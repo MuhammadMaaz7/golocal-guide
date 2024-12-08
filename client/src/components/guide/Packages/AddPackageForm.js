@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { usePackage } from './PackageContext'; // Import the context hook
 
-const AddPackageForm = () => {
+const AddPackageForm = ({ packageId }) => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { packages, fetchPackages, addPackage, updatePackage } = usePackage(); // Use context functions
 
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    city: '',
     price: '',
     availableDates: [],
     includedServices: [],
@@ -17,24 +15,28 @@ const AddPackageForm = () => {
 
   const [errors, setErrors] = useState({});
 
-  // Fetch existing package details for editing
+  // Fetch package details for editing
   useEffect(() => {
+    console.log("In add package form id: ", id);
     if (id) {
-      const existingPackage = packages.find((pkg) => pkg._id === id); // Find the package by ID
-      if (existingPackage) {
+      console.log("Id means edit");
+      // Replace with your API endpoint
+      fetch(`http://localhost:3000/api/packages/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("data: ", data);
         setFormData({
-          title: existingPackage.title || '',
-          description: existingPackage.description || '',
-          price: existingPackage.price || '',
-          availableDates: existingPackage.availableDates || [],
-          includedServices: existingPackage.includedServices || [],
+          title: data.title || '',
+          city: data.city || '',
+          price: data.price || '',
+          availableDates: data.availableDates || [],
+          includedServices: data.includedServices || [],
         });
-      } else {
-        // Fetch packages if they are not already loaded
-        fetchPackages();
-      }
+      })
+      .catch((err) => console.error('Error fetching package:', err));
+    
     }
-  }, [id, packages, fetchPackages]);
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -68,18 +70,32 @@ const AddPackageForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
+      // Submit form (call an API or similar)
       if (id) {
         // Update existing package
-        await updatePackage(id, formData);
+        fetch(`/api/packages/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+          .then((res) => res.json())
+          .then(() => navigate('/my-packages'))
+          .catch((err) => console.error('Error updating package:', err));
       } else {
-        // Add a new package
-        await addPackage(formData);
+        // Create new package
+        fetch('/api/packages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
+          .then((res) => res.json())
+          .then(() => navigate('/my-packages'))
+          .catch((err) => console.error('Error adding package:', err));
       }
-      navigate('/my-packages');
     } else {
       setErrors(validationErrors);
     }
@@ -106,14 +122,14 @@ const AddPackageForm = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="description">Description</label>
+          <label className="block text-sm text-gray-700" htmlFor="city">City</label>
           <textarea
-            id="description"
-            name="description"
-            value={formData.description}
+            id="city"
+            name="city"
+            value={formData.city}
             onChange={handleInputChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="Package Description"
+            placeholder="Package City"
           />
         </div>
 

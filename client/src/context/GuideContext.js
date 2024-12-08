@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 
 // Create the context
 const GuideContext = createContext();
@@ -9,53 +9,76 @@ export const useGuide = () => useContext(GuideContext);
 export const GuideProvider = ({ children }) => {
   const [guideData, setGuideData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Define error state
 
   useEffect(() => {
     const fetchGuideData = async () => {
       try {
         console.log('Fetching guide data');
-        
-        // Get the token from localStorage (or wherever it is stored)
-        const token = localStorage.getItem('token'); // Adjust key name as needed
-        console.log(token);
+        const token = localStorage.getItem('token');
 
-        // If the token is not available, handle the case (e.g., redirect or set an error)
         if (!token) {
           console.error('No token found');
-          setGuideData(null); // Or handle the error appropriately
+          setError('No token found');
           setLoading(false);
           return;
         }
 
-        // Use axios to send the GET request with the Authorization header
         const response = await axios.get('http://localhost:5000/api/guide/profile', {
-          method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`, // Ensure this is the correct token format
+            'Authorization': `Bearer ${token}`,
           },
         });
 
         console.log('Fetched guide data:', response.data);
-        if (response.data) {
-          console.log('setting guide.data:');
-
-          setGuideData(response.data); // Store the guide data
-        } else {
-          setGuideData(null); // Or some default empty state
-        }
+        setGuideData(response.data);
+        setError(null); // Clear any previous errors
       } catch (error) {
         console.error('Error fetching guide data:', error);
-        setGuideData(null); // Optionally set to null on error
+        setError('Error fetching guide data');
       } finally {
         setLoading(false);
       }
     };
 
     fetchGuideData();
-  }, []); // Empty dependency array ensures it only runs once on mount
+  }, []);
+
+  const updateGuideData = async (updatedData) => {
+    try {
+      console.log('Updating guide data:', updatedData);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+
+      const response = await axios.post(
+        'http://localhost:5000/api/guide/profile',
+        updatedData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log('Updated guide data:', response.data);
+      setGuideData(response.data.guide);
+      setError(null); // Clear any previous errors
+      return { success: true, message: 'Guide profile updated successfully' };
+    } catch (error) {
+      console.error('Error updating guide data:', error);
+      setError('Error updating guide data');
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Error updating guide data',
+      };
+    }
+  };
 
   return (
-    <GuideContext.Provider value={{ guideData, loading }}>
+    <GuideContext.Provider value={{ guideData, loading, error, updateGuideData }}>
       {children}
     </GuideContext.Provider>
   );

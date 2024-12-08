@@ -1,54 +1,92 @@
 import React, { useState, useEffect } from 'react';
-import Axios from 'axios';
-import ExperienceCard from '../../components/guide/Experiences/ExperienceCard';
+import { useExperience } from '../../context/ExperienceContext'; // adjust the import as necessary
 import AddExperienceForm from '../../components/guide/Experiences/AddExperienceForm';
-import Sidebar from '../../components/guide/Sidebar';
+import ExperienceCard from '../../components/guide/Experiences/ExperienceCard';
+import Sidebar from '../../components/guide/Sidebar'; // Assuming you have a Sidebar component
+import { useAuth } from '../../context/AuthContext';
 
-const ExperiencesPage = () => {
-  const [experiences, setExperiences] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+const ExperiencePage = () => {
+  const { experiences, loading, error, fetchExperiences, addExperience } = useExperience();
+  const [selectedExperience, setSelectedExperience] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const { user } = useAuth(); // Get current user
 
+
+  // Fetch experiences when component mounts
   useEffect(() => {
-    // Fetch experiences from backend
-    Axios.get('/api/experiences')
-      .then(response => setExperiences(response.data))
-      .catch(error => console.error('Error fetching experiences:', error));
-  }, []);
+    //fetchExperiences(); // Ensure you call this function to fetch experiences
+  }, [fetchExperiences]);
 
   const handleAddExperienceClick = () => {
-    setShowForm(!showForm);
+    setShowAddForm(true);
   };
 
+  const handleExperienceClick = (experience) => {
+    setSelectedExperience(experience);
+  };
+
+  const handleAddExperience = (newExperience) => {
+    console.log("Add experience");
+    newExperience.guideID=user._id;
+    addExperience(newExperience);
+    setShowAddForm(false);  // Close the form after adding the experience
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <div className="flex bg-gray-100 min-h-screen">
+    <div className="flex">
       {/* Sidebar */}
       <Sidebar />
 
-      <div className="flex-1 p-8 bg-white rounded-lg shadow-lg">
-        <h1 className="text-3xl font-semibold text-gray-800">Guide Experiences</h1>
-        <p className="mt-2 text-lg text-gray-600">Explore and share your learning experiences with others.</p>
+      <div className="ml-64 w-full p-8">
+        <h1 className="text-center text-3xl font-semibold text-blue-800">Experience Management</h1>
+        
+        {/* Show the list of experiences */}
+        {!showAddForm && (
+          <>
+            <div className="mt-8 flex justify-between items-center">
+              <h2 className="text-2xl font-semibold text-blue-700">My Experiences</h2>
+              <button
+                onClick={handleAddExperienceClick}
+                className="bg-blue-500 text-white py-2 px-4 rounded"
+              >
+                Add Experience
+              </button>
+            </div>
 
-        <button 
-          onClick={handleAddExperienceClick} 
-          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out"
-        >
-          {showForm ? 'Cancel' : 'Add New Experience'}
-        </button>
+            {experiences.length === 0 ? (
+              <p>No experiences found. Add some!</p>
+            ) : (
+              <ul className="mt-4">
+                {experiences.map((experience) => (
+                  <ExperienceCard
+                    key={experience._id}
+                    experience={experience}
+                    onClick={() => handleExperienceClick(experience)}
+                  />
+                ))}
+              </ul>
+            )}
+          </>
+        )}
 
-        {showForm && <AddExperienceForm setExperiences={setExperiences} />}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {experiences.length > 0 ? (
-            experiences.map(experience => (
-              <ExperienceCard key={experience._id} experience={experience} />
-            ))
-          ) : (
-            <p className="col-span-full text-center text-gray-500">No experiences to display</p>
-          )}
-        </div>
+        {/* Show the Add Experience Form */}
+        {showAddForm && (
+          <AddExperienceForm 
+            addExperience={handleAddExperience} 
+            onCancel={() => setShowAddForm(false)} 
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export default ExperiencesPage;
+export default ExperiencePage;

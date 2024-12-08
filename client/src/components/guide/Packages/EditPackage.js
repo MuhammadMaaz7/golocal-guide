@@ -1,17 +1,39 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { usePackage } from '../../../context/PackageContext';
 
-const AddPackageForm = () => {
+const EditPackageForm = () => {
+  const { id } = useParams(); // Get the package ID from the URL
   const navigate = useNavigate();
+  const { getPackageById, updatePackage } = usePackage(); // Use custom hook to access context methods
 
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    city: '',
     price: '',
     availableDates: [],
     includedServices: [],
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    // Fetch the package details when the component loads
+    const fetchPackageData = async () => {
+      try {
+        const packageData = await getPackageById(id);
+        if (packageData) {
+          setFormData({
+            ...packageData,
+            availableDates: packageData.availableDates.join(', '),
+            includedServices: packageData.includedServices.join(', '),
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching package data:', error);
+      }
+    };
+    fetchPackageData();
+  }, [id, getPackageById]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,37 +43,28 @@ const AddPackageForm = () => {
     });
   };
 
-  const handleServiceChange = (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      includedServices: value.split(','),
-    });
-  };
-
-  const handleDateChange = (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      availableDates: value.split(',').map((date) => new Date(date).toISOString()),
-    });
-  };
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title) newErrors.title = 'Title is required';
     if (!formData.price || formData.price <= 0) newErrors.price = 'Price must be a positive number';
-    if (!formData.availableDates.length) newErrors.availableDates = 'At least one available date is required';
+    if (!formData.availableDates.trim()) newErrors.availableDates = 'At least one available date is required';
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      // Submit form (call an API or similar)
-      console.log('Form submitted', formData);
-      navigate('/my-packages');
+      try {
+        await updatePackage(id, {
+          ...formData,
+          availableDates: formData.availableDates.split(',').map((date) => new Date(date.trim()).toISOString()),
+          includedServices: formData.includedServices.split(',').map((service) => service.trim()),
+        });
+        navigate('/my-packages');
+      } catch (error) {
+        console.error('Error updating package:', error);
+      }
     } else {
       setErrors(validationErrors);
     }
@@ -59,7 +72,7 @@ const AddPackageForm = () => {
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">Add New Package</h2>
+      <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">Edit Package</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm text-gray-700" htmlFor="title">Package Title</label>
@@ -76,14 +89,14 @@ const AddPackageForm = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="description">Description</label>
+          <label className="block text-sm text-gray-700" htmlFor="=city">City</label>
           <textarea
-            id="description"
-            name="description"
-            value={formData.description}
+            id="city"
+            name="city"
+            value={formData.city}
             onChange={handleInputChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="Package Description"
+            placeholder="Package City"
           />
         </div>
 
@@ -108,7 +121,7 @@ const AddPackageForm = () => {
             id="availableDates"
             name="availableDates"
             value={formData.availableDates}
-            onChange={handleDateChange}
+            onChange={handleInputChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
             placeholder="e.g., 2024-12-01, 2024-12-02"
           />
@@ -122,18 +135,18 @@ const AddPackageForm = () => {
             id="includedServices"
             name="includedServices"
             value={formData.includedServices}
-            onChange={handleServiceChange}
+            onChange={handleInputChange}
             className="w-full p-2 mt-1 border rounded-md text-gray-700"
             placeholder="e.g., meals, transport"
           />
         </div>
 
         <button type="submit" className="w-full bg-blue-800 text-white p-3 rounded-md hover:bg-blue-700 transition duration-300">
-          Add Package
+          Save Changes
         </button>
       </form>
     </div>
   );
 };
 
-export default AddPackageForm;
+export default EditPackageForm;

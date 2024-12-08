@@ -1,26 +1,22 @@
-// server/routes/experienceRoutes.js
-
+// guideExperienceRoutes.js
 import express from 'express';
-import {
-  addExperience,
-  getExperiencesByGuide,
-  updateExperience,
-  deleteExperience,
-  uploadFiles
-} from '../../controllers/guide/guideExperienceController.js';
+import multer from 'multer';
+import { getExperiences, addExperience, deleteExperience } from '../../controllers/guide/guideExperienceController.js';
 
 const router = express.Router();
 
-// Add experience
-router.post('/', uploadFiles, addExperience);
+// Set up multer for handling file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
 
-// Get experiences by guide ID
-router.get('/:guideID', getExperiencesByGuide);
-
-// Update an experience
-router.put('/:id', uploadFiles, updateExperience);
-
-// Delete an experience
-router.delete('/:id', deleteExperience);
-
+router.get('/experiences', getExperiences);
+router.post('/experiences', addExperience);
+router.delete('/experiences/:id', deleteExperience);
 export default router;

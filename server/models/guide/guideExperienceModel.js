@@ -12,8 +12,6 @@ const guideExperienceSchema = new mongoose.Schema({
         default: 'in-progress' 
     },
     location: { type: String },
-    rating: { type: Number, min: 1, max: 5 },
-    skillsLearned: [String],
     tags: [String],  // Tags to categorize experience
     images: [{ type: String }], // URLs
     videos: [{ type: String }], // URLs
