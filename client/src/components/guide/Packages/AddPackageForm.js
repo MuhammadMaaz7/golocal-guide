@@ -1,72 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Calendar, X, Plus, ImageIcon } from 'lucide-react';
 
-const AddPackageForm = ({ packageId }) => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  const [formData, setFormData] = useState({
+const AddPackageForm = ({ 
+  initialData = {
     title: '',
     city: '',
     price: '',
     availableDates: [],
     includedServices: [],
-  });
-
+    imageUrl: ''
+  },
+  onSubmit,
+  onCancel 
+}) => {
+  const [formData, setFormData] = useState(initialData);
   const [errors, setErrors] = useState({});
+  const [date, setDate] = useState('');
 
-  // Fetch package details for editing
-  useEffect(() => {
-    console.log("In add package form id: ", id);
-    if (id) {
-      console.log("Id means edit");
-      // Replace with your API endpoint
-      fetch(`http://localhost:3000/api/packages/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("data: ", data);
-        setFormData({
-          title: data.title || '',
-          city: data.city || '',
-          price: data.price || '',
-          availableDates: data.availableDates || [],
-          includedServices: data.includedServices || [],
-        });
-      })
-      .catch((err) => console.error('Error fetching package:', err));
-    
-    }
-  }, [id]);
+  const serviceOptions = [
+    'Meals', 'Transport', 'Guide', 'Snacks', 'Wifi', 'Parking', 'Photography'
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
-  const handleServiceChange = (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      includedServices: value.split(','),
-    });
+  const handleAddDate = () => {
+    if (date && !formData.availableDates.includes(date)) {
+      setFormData(prev => ({
+        ...prev,
+        availableDates: [...prev.availableDates, date]
+      }));
+      setDate('');
+    }
   };
 
-  const handleDateChange = (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      availableDates: value.split(',').map((date) => new Date(date).toISOString()),
-    });
+  const handleRemoveDate = (dateToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      availableDates: prev.availableDates.filter(date => date !== dateToRemove)
+    }));
+  };
+
+  const handleAddService = (service) => {
+    if (!formData.includedServices.includes(service)) {
+      setFormData(prev => ({
+        ...prev,
+        includedServices: [...prev.includedServices, service]
+      }));
+    }
+  };
+
+  const handleRemoveService = (service) => {
+    setFormData(prev => ({
+      ...prev,
+      includedServices: prev.includedServices.filter(s => s !== service)
+    }));
   };
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title) newErrors.title = 'Title is required';
-    if (!formData.price || formData.price <= 0) newErrors.price = 'Price must be a positive number';
-    if (!formData.availableDates.length) newErrors.availableDates = 'At least one available date is required';
+    if (!formData.city) newErrors.city = 'City is required';
+    if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
+    if (formData.availableDates.length === 0) newErrors.dates = 'At least one date is required';
     return newErrors;
   };
 
@@ -74,111 +82,174 @@ const AddPackageForm = ({ packageId }) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      // Submit form (call an API or similar)
-      if (id) {
-        // Update existing package
-        fetch(`/api/packages/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        })
-          .then((res) => res.json())
-          .then(() => navigate('/my-packages'))
-          .catch((err) => console.error('Error updating package:', err));
-      } else {
-        // Create new package
-        fetch('/api/packages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        })
-          .then((res) => res.json())
-          .then(() => navigate('/my-packages'))
-          .catch((err) => console.error('Error adding package:', err));
-      }
+      onSubmit(formData);
     } else {
       setErrors(validationErrors);
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md mx-auto">
-      <h2 className="text-2xl font-semibold text-center text-blue-800 mb-6">
-        {id ? 'Edit Package' : 'Add New Package'}
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="title">Package Title</label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="Package Title"
-          />
-          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="bg-white rounded-lg shadow-lg p-6"
+    >
+      <h2 className="text-2xl font-semibold mb-6">{initialData.title ? 'Edit Package' : 'Add New Package'}</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">Package Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              value={formData.title}
+              onChange={handleInputChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 ${errors.title ? 'border-red-500' : ''}`}
+              placeholder="Enter package title"
+            />
+            {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+            <textarea
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 ${errors.city ? 'border-red-500' : ''}`}
+              placeholder="Enter city description"
+              rows="3"
+            />
+            {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price ($)</label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              value={formData.price}
+              onChange={handleInputChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 ${errors.price ? 'border-red-500' : ''}`}
+              placeholder="Enter price"
+            />
+            {errors.price && <p className="mt-1 text-sm text-red-500">{errors.price}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Available Dates</label>
+            <div className="mt-1 flex rounded-md shadow-sm">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="flex-1 rounded-none rounded-l-md border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+              />
+              <button
+                type="button"
+                onClick={handleAddDate}
+                className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm"
+              >
+                Add
+              </button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {formData.availableDates.map((date, index) => (
+                <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                  {date}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveDate(date)}
+                    className="flex-shrink-0 ml-1.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-emerald-400 hover:bg-emerald-200 hover:text-emerald-500 focus:outline-none focus:bg-emerald-500 focus:text-white"
+                  >
+                    <span className="sr-only">Remove date</span>
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            {errors.dates && <p className="mt-1 text-sm text-red-500">{errors.dates}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Included Services</label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {serviceOptions.map((service) => (
+                <button
+                  key={service}
+                  type="button"
+                  onClick={() => 
+                    formData.includedServices.includes(service) 
+                      ? handleRemoveService(service)
+                      : handleAddService(service)
+                  }
+                  className={`inline-flex items-center px-3 py-1.5 border rounded-full text-xs font-medium ${
+                    formData.includedServices.includes(service)
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : 'bg-gray-100 text-gray-800 border-gray-200'
+                  }`}
+                >
+                  {service}
+                  {formData.includedServices.includes(service) && (
+                    <X className="ml-1.5 h-3 w-3" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">Image URL</label>
+            <div className="mt-1 flex rounded-md shadow-sm">
+              <input
+                type="text"
+                name="imageUrl"
+                id="imageUrl"
+                value={formData.imageUrl}
+                onChange={handleInputChange}
+                className="flex-1 rounded-none rounded-l-md border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                placeholder="Enter image URL"
+              />
+              <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                <ImageIcon className="h-5 w-5" />
+              </span>
+            </div>
+            {formData.imageUrl && (
+              <div className="mt-2 relative w-24 h-24 border rounded">
+                <img
+                  src={formData.imageUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.svg?height=96&width=96";
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="city">City</label>
-          <textarea
-            id="city"
-            name="city"
-            value={formData.city}
-            onChange={handleInputChange}
-            className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="Package City"
-          />
+        <div className="flex justify-end gap-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          >
+            {initialData.title ? 'Update Package' : 'Add Package'}
+          </button>
         </div>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="price">Price ($)</label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={formData.price}
-            onChange={handleInputChange}
-            className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="Price"
-          />
-          {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="availableDates">Available Dates (comma separated)</label>
-          <input
-            type="text"
-            id="availableDates"
-            name="availableDates"
-            value={formData.availableDates.join(',')}
-            onChange={handleDateChange}
-            className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="e.g., 2024-12-01, 2024-12-02"
-          />
-          {errors.availableDates && <p className="text-red-500 text-sm mt-1">{errors.availableDates}</p>}
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm text-gray-700" htmlFor="includedServices">Included Services (comma separated)</label>
-          <input
-            type="text"
-            id="includedServices"
-            name="includedServices"
-            value={formData.includedServices.join(',')}
-            onChange={handleServiceChange}
-            className="w-full p-2 mt-1 border rounded-md text-gray-700"
-            placeholder="e.g., meals, transport"
-          />
-        </div>
-
-        <button type="submit" className="w-full bg-blue-800 text-white p-3 rounded-md hover:bg-blue-700 transition duration-300">
-          {id ? 'Update Package' : 'Add Package'}
-        </button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

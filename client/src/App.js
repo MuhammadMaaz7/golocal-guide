@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { GuideProvider } from './context/GuideContext';
 import { PackageProvider } from './context/PackageContext'; // Add PackageProvider
 import { ExperienceProvider } from './context/ExperienceContext'; // Add ExperienceProvider
-
+import { GuideRequestsProvider } from './context/RequestsContext'; // Correct import
 // Pages and Components
 import HomePage from './pages/HomePage';
 import SignupPage from './pages/SignupPage';
@@ -176,16 +176,19 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <GuideProvider>
-        <PackageProvider> {/* Wrap with PackageProvider */}
-          <ExperienceProvider> {/* Wrap with ExperienceProvider */}
+    <GuideProvider>
+      <PackageProvider>
+        <ExperienceProvider>
+          <GuideRequestsProvider> {/* Use the correct provider */}
             <Router>
               <AppRoutes />
             </Router>
-          </ExperienceProvider>
-        </PackageProvider>
-      </GuideProvider>
-    </AuthProvider>
+          </GuideRequestsProvider>
+        </ExperienceProvider>
+      </PackageProvider>
+    </GuideProvider>
+  </AuthProvider>
+  
   );
 }
 

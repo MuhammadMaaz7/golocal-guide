@@ -1,44 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import ProfileCard from './ProfileCard';
-import GuideInfoCard from './GuideInfoCard';
 
-const Dashboard = ({ userId }) => {
-  const [guideData, setGuideData] = useState(null);
+const GuideInfoCard = ({ guideInfo }) => {
+  console.log("Guide: ", guideInfo);
 
-  useEffect(() => {
-    const fetchGuideData = async () => {
-      try {
-        const response = await fetch(`/api/guide/profile`);
-        const data = await response.json();
-        if (response.ok) {
-          setGuideData(data);  // Set the guide data
-        } else {
-          console.error('Error fetching guide data:', data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching guide data:', error);
-      }
-    };
-
-    if (userId) {
-      fetchGuideData();
-    }
-  }, [userId]);
-
-  if (!guideData) {
-    return <div>Loading...</div>;
-  }
+  // Destructure guideInfo for easy use
+  const { yearsOfExperience, languages, expertiseAreas } = guideInfo;
 
   return (
-    <div>
-      <ProfileCard profileData={guideData} />
-      <div className="grid grid-cols-2 gap-6 mt-6">
-        <GuideInfoCard title="Experience" value={`${guideData.yearsOfExperience} years`} />
-        <GuideInfoCard title="Languages" value={guideData.languages.join(', ')} />
-        <GuideInfoCard title="Specialization" value={guideData.expertiseAreas.join(', ')} />
+    <div className="space-y-6">
+
+      {/* Additional Info Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        {/* Experience Section */}
+        <motion.div 
+          className="bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl p-6 border border-emerald-100"
+          whileHover={{ scale: 1.05 }}
+        >
+          <motion.h3 className="text-xl font-semibold text-center mb-4 text-teal-600">
+            Experience
+          </motion.h3>
+          <p className="text-center text-gray-600">{yearsOfExperience} years</p>
+        </motion.div>
+
+        {/* Languages Section */}
+        <motion.div 
+          className="bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl p-6 border border-emerald-100"
+          whileHover={{ scale: 1.05 }}
+        >
+          <motion.h3 className="text-xl font-semibold text-center mb-4 text-teal-600">
+            Languages
+          </motion.h3>
+          <p className="text-center text-gray-600">{languages.join(', ')}</p>
+        </motion.div>
+
+        {/* Specialization Section */}
+        <motion.div 
+          className="bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl p-6 border border-emerald-100"
+          whileHover={{ scale: 1.05 }}
+        >
+          <motion.h3 className="text-xl font-semibold text-center mb-4 text-teal-600">
+            Specialization
+          </motion.h3>
+          <p className="text-center text-gray-600">{expertiseAreas.join(', ')}</p>
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default GuideInfoCard;

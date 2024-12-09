@@ -1,19 +1,44 @@
 import React from 'react';
-import TourRequestCard from './TourRequestCard';
+import { motion } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
+import GuideRequestCard from './TourRequestCard';
 
-const TourRequestList = ({ requests, onAccept, onDecline }) => {
+const GuideRequestList = ({ requests, onChatClick, onSort }) => {
   return (
-    <div className="space-y-4">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="space-y-2"
+    >
+      <div className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 px-4 py-2 text-sm font-medium text-gray-500 border-b">
+        <div className="flex items-center cursor-pointer" onClick={() => onSort('area')}>
+          Area and Tourist
+          <ChevronDown className="w-4 h-4 ml-1" />
+        </div>
+        <div className="flex items-center cursor-pointer" onClick={() => onSort('startDate')}>
+          Date
+          <ChevronDown className="w-4 h-4 ml-1" />
+        </div>
+        <div className="flex items-center cursor-pointer" onClick={() => onSort('status')}>
+          Status
+          <ChevronDown className="w-4 h-4 ml-1" />
+        </div>
+        <div className="flex items-center cursor-pointer" onClick={() => onSort('price')}>
+          Price
+          <ChevronDown className="w-4 h-4 ml-1" />
+        </div>
+        <div></div>
+      </div>
+      
       {requests.map((request) => (
-        <TourRequestCard
-          key={request.id}
+        <GuideRequestCard
+          key={request._id}
           request={request}
-          onAccept={onAccept}
-          onDecline={onDecline}
+          onChatClick={onChatClick}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
 
-export default TourRequestList;
+export default GuideRequestList;

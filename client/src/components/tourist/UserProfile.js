@@ -44,7 +44,7 @@ export default function UserProfile({ user }) {
           />
           <div>
             <h3 className="font-bold text-emerald-700 text-sm sm:text-base">{user?.name || 'User'}</h3>
-            <p className="text-xs sm:text-sm text-gray-500">Traveller</p>
+            <p className="text-xs sm:text-sm text-gray-500">Guide</p>
           </div>
         </div>
         <motion.div

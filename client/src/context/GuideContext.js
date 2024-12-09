@@ -51,7 +51,7 @@ export const GuideProvider = ({ children }) => {
       if (!token) {
         throw new Error('No token found');
       }
-
+  
       const response = await axios.post(
         'http://localhost:5000/api/guide/profile',
         updatedData,
@@ -62,7 +62,7 @@ export const GuideProvider = ({ children }) => {
           },
         }
       );
-
+  
       console.log('Updated guide data:', response.data);
       setGuideData(response.data.guide);
       setError(null); // Clear any previous errors
@@ -76,7 +76,7 @@ export const GuideProvider = ({ children }) => {
       };
     }
   };
-
+  
   return (
     <GuideContext.Provider value={{ guideData, loading, error, updateGuideData }}>
       {children}

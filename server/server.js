@@ -8,7 +8,7 @@ import guideRoutes from './routes/guide/guideProfileRoutes.js';  // Default impo
 import experienceRoutes from './routes/guide/guideExperienceRoutes.js';  // Default import
 import packageRoutes from './routes/guide/packagesRoutes.js';  // Default import
 import jwt from 'jsonwebtoken';  // Import jwt for token generation
-
+import guidereqsRoutes from './routes/guide/guideRequestsRoutes.js';
 dotenv.config();
 
 const app = express();
@@ -26,6 +26,7 @@ app.use('/api/users', userRoutes);
 app.use('/api', guideRoutes);
 app.use('/api', packageRoutes);  // Prefix all package routes with /api
 app.use('/api', experienceRoutes);  // Prefix all package routes with /api
+app.use('/api', guidereqsRoutes);
 
 
 // Example login route for issuing JWT tokens

@@ -19,10 +19,6 @@ const chatMessageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  seen: {
-    type: Boolean,
-    default: false, // Flag to indicate if the message has been seen by the recipient
-  },
 });
 
 const chatSchema = new mongoose.Schema({

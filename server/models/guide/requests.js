@@ -1,39 +1,67 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
-// Define the booking schema
-const bookingSchema = new Schema(
+const { Schema } = mongoose;
+
+// Define the Request schema
+const requestSchema = new Schema(
   {
     tourist: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to the User model for the tourist
-      required: true,
+      ref: 'User',
+      required: [true, 'Tourist is required'], // Reference to User model
     },
     guide: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to the User model for the guide
-      required: true,
+      ref: 'Guide',
+      required: [true, 'Guide is required'], // Reference to Guide model
     },
     startDate: {
       type: Date,
-      required: true,
+      required: [true, 'Start date is required'],
+      validate: {
+        validator: function (value) {
+          return value > Date.now(); // Ensure start date is in the future
+        },
+        message: 'Start date must be in the future',
+      },
     },
     endDate: {
       type: Date,
-      required: true,
+      required: [true, 'End date is required'],
+      validate: {
+        validator: function (value) {
+          return value > this.startDate; // Ensure end date is after start date
+        },
+        message: 'End date must be after the start date',
+      },
     },
     status: {
       type: String,
-      enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+      enum: {
+        values: ['pending', 'confirmed', 'completed', 'cancelled'],
+        message: 'Invalid status value',
+      },
       default: 'pending',
-    },
-    requestStatus: {
-      type: Boolean,
-      default: false, // false = request not made, true = request made
     },
     area: {
       type: String,
-      required: true, // Area where the guide will provide service
+      required: [true, 'Area is required'],
+      minlength: [3, 'Area name must be at least 3 characters long'],
+      maxlength: [100, 'Area name must not exceed 100 characters'],
+    },
+    phone: {
+      type: String,
+      required: [true, 'Phone number is required'],
+      validate: {
+        validator: function (value) {
+          return /^\+?[1-9]\d{1,14}$/.test(value); // Validates international phone number format
+        },
+        message: 'Invalid phone number format',
+      },
+    },
+    message: {
+      type: String,
+      maxlength: [500, 'Message must not exceed 500 characters'],
     },
     createdAt: {
       type: Date,
@@ -45,11 +73,11 @@ const bookingSchema = new Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically manage createdAt and updatedAt fields
   }
 );
 
 // Create the model
-const Booking = mongoose.model('Booking', bookingSchema);
+const Request = mongoose.model('Request', requestSchema);
 
-module.exports = Booking;
+export default Request;
