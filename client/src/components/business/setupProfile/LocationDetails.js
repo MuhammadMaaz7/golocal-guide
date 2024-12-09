@@ -146,7 +146,7 @@ export default function LocationDetails({ onNext }) {
             name="country"
             value={formData.country}
             onChange={handleChange}
-            required
+            
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
           >
             <option value="">Select a country</option>

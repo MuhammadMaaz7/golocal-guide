@@ -29,7 +29,7 @@ const ProfilePicture = ({ currentImage, onImageChange, onImageDelete }) => {
       <div className="flex items-center gap-6">
         <motion.div
           className={`relative w-32 h-32 rounded-full overflow-hidden border-2 
-            ${isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300'}
+            ${isDragging ? 'border-emerald-500 bg-emerald-50' : 'border-gray-300'}
           `}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -58,7 +58,7 @@ const ProfilePicture = ({ currentImage, onImageChange, onImageDelete }) => {
         <div className="space-y-2">
           <button
             onClick={() => document.getElementById('profile-picture').click()}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700"
           >
             <Upload className="w-4 h-4" />
             Upload New Picture

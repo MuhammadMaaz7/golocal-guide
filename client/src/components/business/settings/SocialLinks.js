@@ -45,7 +45,7 @@ const SocialLinks = ({ links, onChange }) => {
                   newLinks[index].platform = e.target.value;
                   onChange(newLinks);
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 {platforms.map(platform => (
                   <option key={platform.id} value={platform.id}>
@@ -81,7 +81,7 @@ const SocialLinks = ({ links, onChange }) => {
           <select
             value={newLink.platform}
             onChange={(e) => setNewLink({ ...newLink, platform: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           >
             <option value="">Select Platform</option>
             {platforms.map(platform => (
@@ -101,7 +101,7 @@ const SocialLinks = ({ links, onChange }) => {
         </div>
         <button
           onClick={handleAdd}
-          className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg"
+          className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg"
         >
           <Plus className="w-5 h-5" />
         </button>

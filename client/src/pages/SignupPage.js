@@ -184,7 +184,7 @@ const Signup = () => {
         const { email, password, name, role, ...additionalInfo } = formData;
         user = await signup(email, password, name, role, { 
           ...additionalInfo, 
-          isProfileComplete: true // Explicitly set isProfileComplete to true
+          isProfileComplete: true 
         });
       }
   

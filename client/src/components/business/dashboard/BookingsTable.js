@@ -1,99 +1,117 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, MoreHorizontal, Search } from 'lucide-react';
+import axios from 'axios';
 
 export default function BookingsTable() {
-  const bookings = [
-    {
-      id: '#1223',
-      guest: 'Alex Trie',
-      email: 'Alex08@gmail.com',
-      roomNumber: '5-01',
-      roomType: 'Single',
-      checkIn: 'Jan 21, 2025',
-      checkOut: 'Jan 26, 2025',
-      status: 'New'
-    },
-    {
-      id: '#1224',
-      guest: 'Annette Black',
-      email: 'Ann23@gmail.com',
-      roomNumber: '5-22',
-      roomType: 'Single',
-      checkIn: 'Jan 8, 2025',
-      checkOut: 'Jan 20, 2025',
-      status: 'Checked In'
-    },
-    // Add more bookings as needed
-  ];
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'new': return 'text-purple-500';
-      case 'checked in': return 'text-yellow-500';
-      case 'confirmed': return 'text-green-500';
-      case 'checked out': return 'text-blue-500';
-      case 'cancelled': return 'text-red-500';
-      default: return 'text-gray-500';
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/manage-bookings', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBookings(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+      setError('Failed to load bookings. Please try again later.');
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="bg-gray-800 rounded-xl p-6 mt-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">New bookings</h2>
-        <select className="bg-gray-700 border-none rounded-lg px-3 py-2">
-          <option>Today</option>
-          <option>This Week</option>
-          <option>This Month</option>
-        </select>
-      </div>
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'confirmed': return 'bg-emerald-100 text-emerald-700';
+      case 'pending': return 'bg-yellow-100 text-yellow-700';
+      case 'completed': return 'bg-blue-100 text-blue-700';
+      case 'cancelled': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="text-gray-400 text-sm">
-              <th className="text-left py-3">Booking ID</th>
-              <th className="text-left py-3">Guest name</th>
-              <th className="text-left py-3">Email</th>
-              <th className="text-left py-3">Room number</th>
-              <th className="text-left py-3">Room type</th>
-              <th className="text-left py-3">Checked In</th>
-              <th className="text-left py-3">Checked Out</th>
-              <th className="text-left py-3">Status</th>
-              <th className="text-left py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((booking, index) => (
-              <motion.tr
-                key={booking.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-sm"
-              >
-                <td className="py-3">{booking.id}</td>
-                <td className="py-3">{booking.guest}</td>
-                <td className="py-3">{booking.email}</td>
-                <td className="py-3">{booking.roomNumber}</td>
-                <td className="py-3">{booking.roomType}</td>
-                <td className="py-3">{booking.checkIn}</td>
-                <td className="py-3">{booking.checkOut}</td>
-                <td className={`py-3 ${getStatusColor(booking.status)}`}>
-                  {booking.status}
-                </td>
-                <td className="py-3">
-                  <button className="p-1 hover:bg-gray-700 rounded">
-                    <ArrowUpRight className="w-4 h-4" />
-                  </button>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
+  if (loading) {
+    return <div className="text-center">Loading bookings...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-600">{error}</div>;
+  }
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-xl shadow-lg border border-gray-100"
+    >
+      <div className="p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">Recent Bookings</h2>
+          <div className="relative w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Search bookings..."
+              className="w-full sm:w-64 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="text-left border-b border-gray-100">
+                <th className="pb-3 text-sm font-medium text-gray-500">Booking ID</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Guest</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Experience</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Date</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Time</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Guests</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Price</th>
+                <th className="pb-3 text-sm font-medium text-gray-500">Status</th>
+                <th className="pb-3 text-sm font-medium text-gray-500"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((booking, index) => (
+                <motion.tr
+                  key={booking._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                >
+                  <td className="py-4 text-sm text-gray-600">#{booking._id.slice(-6)}</td>
+                  <td className="py-4 text-sm font-medium text-gray-900">{booking.user.name}</td>
+                  <td className="py-4 text-sm text-gray-600">{booking.hotelRoom.name}</td>
+                  <td className="py-4 text-sm text-gray-600">{new Date(booking.checkIn).toLocaleDateString()}</td>
+                  <td className="py-4 text-sm text-gray-600">{new Date(booking.checkOut).toLocaleDateString()}</td>
+                  <td className="py-4 text-sm text-gray-600">{booking.numberOfGuests.adults + booking.numberOfGuests.children}</td>
+                  <td className="py-4 text-sm font-medium text-gray-900">${booking.totalPrice}</td>
+                  <td className="py-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                      {booking.status}
+                    </span>
+                  </td>
+                  <td className="py-4">
+                    <button className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                      <MoreHorizontal className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
-

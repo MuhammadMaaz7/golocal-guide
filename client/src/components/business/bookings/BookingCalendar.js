@@ -25,13 +25,16 @@ const BookingCalendar = ({ bookings }) => {
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const previousMonthDays = Array.from({ length: firstDayOfMonth }, (_, i) => i);
 
+  // Function to get bookings for a specific date
   const getBookingsForDate = (date) => {
     return bookings.filter(booking => {
-      const bookingDate = new Date(booking.date);
+      const checkInDate = new Date(booking.checkIn);
+      const checkOutDate = new Date(booking.checkOut);
       return (
-        bookingDate.getDate() === date &&
-        bookingDate.getMonth() === currentDate.getMonth() &&
-        bookingDate.getFullYear() === currentDate.getFullYear()
+        date >= checkInDate.getDate() &&
+        date <= checkOutDate.getDate() &&
+        checkInDate.getMonth() === currentDate.getMonth() &&
+        checkInDate.getFullYear() === currentDate.getFullYear()
       );
     });
   };
@@ -69,22 +72,22 @@ const BookingCalendar = ({ bookings }) => {
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-2">
-        {/* Week days */}
+        {/* Week Days */}
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
             {day}
           </div>
         ))}
 
-        {/* Previous month days */}
-        {previousMonthDays.map(day => (
+        {/* Previous Month Days */}
+        {previousMonthDays.map((_, index) => (
           <div
-            key={`prev-${day}`}
+            key={`prev-${index}`}
             className="aspect-square p-2 text-gray-400 text-center"
           />
         ))}
 
-        {/* Current month days */}
+        {/* Current Month Days */}
         {days.map(day => {
           const dayBookings = getBookingsForDate(day);
           const hasBookings = dayBookings.length > 0;
@@ -116,4 +119,3 @@ const BookingCalendar = ({ bookings }) => {
 };
 
 export default BookingCalendar;
-
