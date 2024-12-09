@@ -46,7 +46,7 @@ export const GuideProvider = ({ children }) => {
 
   const updateGuideData = async (updatedData) => {
     try {
-      console.log('Updating guide data:', updatedData);
+      console.log('Updating guide data Photo url:', updatedData);
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found');

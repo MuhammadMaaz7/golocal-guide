@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+
 const GuideRequestsContext = createContext();
+
 export const useGuideRequests = () => useContext(GuideRequestsContext);
+
 export const GuideRequestsProvider = ({ children }) => {
   const [requests, setRequests] = useState([]);
   const [stats, setStats] = useState({});
@@ -98,32 +101,32 @@ export const GuideRequestsProvider = ({ children }) => {
     }
   };
   
-  const sendChatMessage = async (requestId, message) => {
-    console.log("In send messages context");
-    try {
-      const token = localStorage.getItem('token'); // Adjust key name as needed
-      if (!token) {
-        throw new Error('No token found in local storage. User might not be logged in.');
-      }
-  
-      const response = await axios.post(
-        `http://localhost:5000/api/guide/requests/${requestId}/chat`,
-        { message }, // Payload
-        { // Headers
-          headers: {
-            Authorization: `Bearer ${token}`, // Ensure this is the correct token format
-          },
-        }
-      );
-  
-      return response.data;
-    } catch (err) {
-      console.error(err);  // Log the actual error for debugging
-      setError('Failed to send chat message');
-      throw err;
+const sendChatMessage = async (requestId, message) => {
+  console.log("In send messages context");
+  try {
+    const token = localStorage.getItem('token'); // Adjust key name as needed
+    if (!token) {
+      throw new Error('No token found in local storage. User might not be logged in.');
     }
-  };
-  
+
+    const response = await axios.post(
+      `http://localhost:5000/api/guide/requests/${requestId}/chat`,
+      { message }, // Payload
+      { // Headers
+        headers: {
+          Authorization: `Bearer ${token}`, // Ensure this is the correct token format
+        },
+      }
+    );
+
+    return response.data;
+  } catch (err) {
+    console.error(err);  // Log the actual error for debugging
+    setError('Failed to send chat message');
+    throw err;
+  }
+};
+
 
   const value = {
     requests,

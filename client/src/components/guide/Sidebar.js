@@ -40,10 +40,10 @@ export default function Sidebar() {
   return (
     <>
       <button
-        className="fixed top-4 left-4 z-50 p-2 bg-emerald-600 rounded-full shadow-md md:hidden"
+        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-full shadow-md md:hidden"
         onClick={toggleSidebar}
       >
-        {isOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+        {isOpen ? <X className="w-6 h-6 text-emerald-600" /> : <Menu className="w-6 h-6 text-emerald-600" />}
       </button>
 
       <AnimatePresence>
@@ -54,21 +54,24 @@ export default function Sidebar() {
             exit="closed"
             variants={sidebarVariants}
             transition={{ duration: 0.3, type: 'tween' }}
-            className="fixed inset-y-0 left-0 z-40 w-64 bg-emerald-700 shadow-lg md:relative md:shadow-none"
+            className="fixed inset-y-0 left-0 z-40 w-64 rounded-lg bg-white shadow-lg md:relative md:shadow-none"
           >
-            <div className="h-full overflow-y-auto p-4 flex flex-col">
-              <h2 className="text-3xl font-semibold mb-8 text-center text-white">Guide Panel</h2>
+            <div className="h-full overflow-y-auto p-6 flex flex-col">
+              <div className="flex items-center gap-2 mb-8">
+                <MapPin className="w-7 h-7 text-emerald-600" />
+                <span className="text-xl font-bold text-emerald-600">GoLocal Guide</span>
+              </div>
 
               <nav className="flex-1 space-y-2">
                 {menuItems.map((item) => (
                   <motion.div key={item.name} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                       to={item.path}
-                      className={`flex items-center gap-4 w-full p-3 rounded-lg text-white text-lg hover:text-emerald-200 transition-colors ${
-                        location.pathname === item.path ? 'bg-emerald-600' : ''
+                      className={`flex items-center gap-3 w-full p-3 rounded-lg text-gray-600 hover:bg-emerald-50 transition-colors ${
+                        location.pathname === item.path ? 'bg-emerald-100 text-emerald-700' : ''
                       }`}
                     >
-                      <item.icon className="w-5 h-5 group-hover:text-emerald-200" />
+                      <item.icon size={20} className={location.pathname === item.path ? 'text-emerald-700' : 'text-emerald-600'} />
                       <span>{item.name}</span>
                     </Link>
                   </motion.div>
@@ -78,9 +81,9 @@ export default function Sidebar() {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-4 w-full p-3 mt-4 text-white text-lg hover:text-emerald-200 transition-colors rounded-lg"
+                className="flex items-center gap-3 w-full p-3 mt-4 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors rounded-lg"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut size={20} />
                 <span>Log Out</span>
               </motion.button>
             </div>

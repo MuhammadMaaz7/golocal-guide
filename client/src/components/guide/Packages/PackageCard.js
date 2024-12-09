@@ -2,13 +2,25 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, DollarSign, PackageIcon, Edit, Trash } from 'lucide-react';
 
+const imageUrls = [
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMkt_OzpQSq0Q_V6aNs023MkgdDzP3CRqAyA&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQggZKcU29GMaK-WooyxGKt5VROUBa-P-coyQ&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhL8VQSGpfUPvR6_CbR9npXoGhkPqDB4xeUA&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbUbnnfQ4MBOGTsu87QxSbgQbzm4Y7SDNyAg&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQB7hucg6Jx5gAB2aHmdQSBbokN7Z5YsmVLw&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGXa6vjLcphg08ZuDN1Q8mEyVMu-6IzY5O6g&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ84Ij8Ls124x0zXkCMYRBLSeMRgOdMODZI3A&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtOt3AFWl6xAe-FWlSvy_ls_wzY4qpn7bqew&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDRPVq_4ehTsV9FD8rWuz4JPNMQn6NlHhUVA&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQorNv_GB1uLswRGpKiTP2MNWTpVQ1iaT-tAQ&s"
+];
 const PackageCard = ({ 
   title, 
   city, 
   price, 
   availableDates, 
   includedServices,
-  imageUrl = '/images/guide1.jpg',
+  imageUrl = imageUrls[Math.floor(Math.random() * imageUrls.length)], // Assign random image URL
   onEdit,
   onDelete 
 }) => {

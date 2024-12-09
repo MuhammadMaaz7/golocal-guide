@@ -16,9 +16,24 @@ const AddExperienceForm = ({ addExperience, onCancel }) => {
     videos: ''
   });
 
+  const validateStatus = (startDate, endDate) => {
+    const today = new Date();
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    if (start && start > today) return 'upcoming';
+    if (end && end > today) return start && start > today ? 'upcoming' : 'in-progress';
+    return 'completed';
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, [name]: value };
+      const updatedStatus = validateStatus(updatedData.startDate, updatedData.endDate);
+      return { ...updatedData, status: updatedStatus };
+    });
   };
 
   const handleSubmit = (e) => {
@@ -179,6 +194,7 @@ const AddExperienceForm = ({ addExperience, onCancel }) => {
             value={formData.status}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled
           >
             <option value="in-progress">In Progress</option>
             <option value="completed">Completed</option>

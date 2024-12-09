@@ -8,6 +8,7 @@ const guidePackageSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     availableDates: [{ type: Date }],
     includedServices: [{ type: String }], // E.g., meals, transport
+    images: [{ type: String }], // URLs
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

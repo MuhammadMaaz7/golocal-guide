@@ -10,7 +10,8 @@ export const getGuideRequests = async (req, res) => {
     console.log("guideId: ", guideId);
 
     // Fetch requests where the guide matches the guideId
-    const requests = await Request.find({ guide: req.user.id }).sort({ createdAt: -1 });
+    //const requests = await Request.find({ guide: req.user.id }).sort({ createdAt: -1 });
+    const requests = await Request.find().sort({ createdAt: -1 });
 
     // Calculate statistics based on the status of the requests
     const stats = {
@@ -19,7 +20,7 @@ export const getGuideRequests = async (req, res) => {
       confirmed: requests.filter(r => r.status === 'confirmed').length,
       cancelled: requests.filter(r => r.status === 'cancelled').length,
     };
-
+    const guide = await Guide.findOne({ _id: req.user.id});
     console.log("Requests: ", requests);
     console.log("Stats: ", stats);
 
@@ -39,8 +40,14 @@ export const updateGuideRequestStatus = async (req, res) => {
     const { status } = req.body;
     const guideId = req.user.id;
     console.log("Updating status in Controller");
-    const request = await Request.findOneAndUpdate(
-      { _id: requestId , guide: req.user.id },
+    // const request = await Request.findOneAndUpdate(
+    //   { _id: requestId , guide: req.user.id },
+    //   { status },
+    //   { new: true }
+    // );
+
+     const request = await Request.findOneAndUpdate(
+      { _id: requestId},
       { status },
       { new: true }
     );

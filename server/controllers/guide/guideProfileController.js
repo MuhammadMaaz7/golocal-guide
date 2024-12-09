@@ -30,6 +30,7 @@ const getGuideProfile = async (req, res) => {
 
       
     if (!guide) return res.status(404).json({ message: 'Guide not found' });
+    guide.profilePictureURL='https://e7.pngegg.com/pngimages/84/165/png-clipart-united-states-avatar-organization-information-user-avatar-service-computer-wallpaper.png';
 
     res.status(200).json(guide);
   } catch (error) {
@@ -41,7 +42,7 @@ const getGuideProfile = async (req, res) => {
 
 // Update guide profile, including the profile picture URL
 const updateGuideProfile = async (req, res) => {
-  console.log("UpdateGuideProfile in controller, ",req);
+  console.log("UpdateGuideProfile in controller,", req);
   const { guideId, name, guideType, yearsOfExperience, fee, languages, expertiseAreas, profilePictureURL } = req.body;
 
   try {
@@ -54,7 +55,10 @@ const updateGuideProfile = async (req, res) => {
     guide.fee = fee || guide.fee;
     guide.languages = languages || guide.languages;
     guide.expertiseAreas = expertiseAreas || guide.expertiseAreas;
-    guide.profilePictureURL = profilePictureURL || guide.profilePictureURL;
+
+    // Check if the profilePictureURL is empty
+    guide.profilePictureURL =  guide.profilePictureURL || 
+      "https://e7.pngegg.com/pngimages/84/165/png-clipart-united-states-avatar-organization-information-user-avatar-service-computer-wallpaper.png";
 
     await guide.save();
     console.log("Updated guide in controller");
@@ -65,5 +69,6 @@ const updateGuideProfile = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 export { uploadImage, updateGuideProfile };

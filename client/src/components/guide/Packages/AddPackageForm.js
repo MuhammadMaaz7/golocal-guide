@@ -37,13 +37,25 @@ const AddPackageForm = ({
   };
 
   const handleAddDate = () => {
-    if (date && !formData.availableDates.includes(date)) {
-      setFormData(prev => ({
+    if (!date) {
+      setErrors(prev => ({
         ...prev,
-        availableDates: [...prev.availableDates, date]
+        dates: 'Date cannot be empty'
       }));
-      setDate('');
+      return;
     }
+    if (formData.availableDates.includes(date)) {
+      setErrors(prev => ({
+        ...prev,
+        dates: 'Date is already added'
+      }));
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      availableDates: [...prev.availableDates, date]
+    }));
+    setDate('');
   };
 
   const handleRemoveDate = (dateToRemove) => {
@@ -71,10 +83,19 @@ const AddPackageForm = ({
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.title) newErrors.title = 'Title is required';
-    if (!formData.city) newErrors.city = 'City is required';
-    if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
-    if (formData.availableDates.length === 0) newErrors.dates = 'At least one date is required';
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.price || isNaN(formData.price) || formData.price <= 0) {
+      newErrors.price = 'Price must be a positive number';
+    }
+    if (formData.availableDates.length === 0) {
+      newErrors.dates = 'At least one date is required';
+    }
+    // if (!formData.imageUrl.trim()) {
+    //   newErrors.imageUrl = 'Image URL is required';
+    // } else if (!/^https?:\/\/.*\.(jpeg|jpg|png|webp|svg)$/.test(formData.imageUrl)) {
+    //   newErrors.imageUrl = 'Invalid image URL format';
+    // }
     return newErrors;
   };
 
@@ -218,7 +239,8 @@ const AddPackageForm = ({
                 <ImageIcon className="h-5 w-5" />
               </span>
             </div>
-            {formData.imageUrl && (
+            {errors.imageUrl && <p className="mt-1 text-sm text-red-500">{errors.imageUrl}</p>}
+            {formData.imageUrl && !errors.imageUrl && (
               <div className="mt-2 relative w-24 h-24 border rounded">
                 <img
                   src={formData.imageUrl}
