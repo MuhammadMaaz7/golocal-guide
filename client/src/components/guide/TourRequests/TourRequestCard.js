@@ -38,7 +38,7 @@ const GuideRequestCard = ({ request, onChatClick }) => {
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
             <img
-              src={request.tourist.avatar || "/placeholder.svg?height=40&width=40"}
+              src={request.tourist.avatar || "./logo192.png"}
               alt={request.tourist.name}
               className="w-full h-full rounded-full object-cover"
             />

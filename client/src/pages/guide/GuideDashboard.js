@@ -54,7 +54,7 @@ const GuideDashboard = () => {
           
           {/* Flex container to display graphs side by side */}
           <div className="flex space-x-8">
-            <div className="w-2/3">
+            <div className="w-1/3">
               <ChartComponent />
             </div>
             <div className="w-2/3">
@@ -68,7 +68,7 @@ const GuideDashboard = () => {
       <AnimatePresence>
         {(showRightSidebar || !isMobile) && (
           <motion.aside
-            initial={isMobile ? { x: '100%' } : false}
+            initial={isMobile ? { x: '70%' } : false}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', bounce: 0, duration: 0.4 }}
